@@ -1,0 +1,5 @@
+#!/bin/python
+
+Import('env')
+
+print 'copying headers to build directory'

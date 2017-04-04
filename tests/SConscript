@@ -1,0 +1,12 @@
+#!/bin/python
+
+import os
+
+Import('env')
+
+src_files = Glob('*.cpp')
+i = 0
+print src_files
+for src in src_files:
+    env.Program('test' + str(i), src, LIBS = ['saw'], LIBPATH='../')
+    i += 1
