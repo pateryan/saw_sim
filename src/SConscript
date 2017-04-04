@@ -1,0 +1,10 @@
+#!/bin/python
+
+import os
+
+Import('env')
+
+lib = env.StaticLibrary(target = 'saw', source =['direction.cpp'])
+Command(target = "../libsaw.a",
+        source = lib,
+        action = Copy("$TARGET", "$SOURCE"))

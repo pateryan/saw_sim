@@ -4,9 +4,9 @@ import os
 
 Import('env')
 
-src_files = Glob('*.cpp')
+src_files = ['t_direction.cpp']
 i = 0
-print src_files
+#print src_files
 for src in src_files:
-    env.Program('test' + str(i), src, LIBS = ['saw'], LIBPATH='../')
+    env.Program('test' + str(i), src, LIBS = ['saw'], LIBPATH='#/build/')
     i += 1
