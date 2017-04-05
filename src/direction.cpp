@@ -51,4 +51,41 @@ direction_string(Direction d)
     }
     return s;
 }
+
+std::ostream& operator<<(std::ostream& os, const Direction d)
+{
+    os << direction_string(d);
+    return os;
+}
+
+
+Direction_rng::Direction_rng()
+{
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<std::uint8_t> rng(0, 3);
+    this->generator = mt;
+    this->dist = rng;
+    this->last = Direction::inval;
+}
+
+Direction
+Direction_rng::generate_nonreversing_direction()
+{
+    auto d = Direction::inval;
+    do {
+        d = (Direction)dist(generator);
+    } while (d == opposite_direction(last));
+    this->last = d;
+    return d;
+}
+
+Direction
+Direction_rng::generate_direction()
+{
+    auto d = (Direction)dist(generator);
+    this->last = d;
+    return d;
+}
+
 } // namespace saw

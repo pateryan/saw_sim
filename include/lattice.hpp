@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <ostream>
-
 #include <cstdint>
 
 #include "direction.hpp"
@@ -17,7 +16,7 @@ enum class BoundaryCondition : std::uint8_t {
 
 class Lattice {
 public:
-    Lattice(std::size_t width, std::size_t height, BoundaryCondition bc = BoundaryCondition::periodic);
+    Lattice(std::size_t width, std::size_t height, BoundaryCondition bc = BoundaryCondition::finite);
     ~Lattice();
 
     BoundaryCondition get_bc(void) {return bc;}
