@@ -16,12 +16,13 @@ enum class BoundaryCondition : std::uint8_t {
 
 class Lattice {
 public:
-    Lattice(std::size_t width, std::size_t height, BoundaryCondition bc = BoundaryCondition::finite);
-    ~Lattice();
+    Lattice(std::size_t width, std::size_t height, 
+            BoundaryCondition bc = BoundaryCondition::finite);
+    ~Lattice() {};
 
     BoundaryCondition get_bc(void) {return bc;}
-    std::uint8_t operator [](std::size_t index) const {return lattice_sites[index];}
-    std::uint8_t& operator [](std::size_t index){return lattice_sites[index];}
+    std::uint8_t operator [](std::size_t i) const {return lattice_sites[i];}
+    std::uint8_t& operator [](std::size_t i) {return lattice_sites[i];}
     std::size_t size() {return width * height;}
 
     void print(std::ostream&) const;
@@ -34,6 +35,7 @@ private:
     std::vector<std::uint8_t> lattice_sites;
     std::size_t width;
     std::size_t height;
+    std::size_t size;
     BoundaryCondition bc;
     std::vector<std::vector<std::size_t>> neighbor_array;
 };
