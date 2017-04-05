@@ -4,7 +4,7 @@ import os
 
 Import('env')
 
-lib = env.StaticLibrary(target = 'saw', source =['direction.cpp'])
+lib = env.StaticLibrary(target = 'saw', source =['direction.cpp', 'lattice.cpp'])
 Command(target = "../libsaw.a",
         source = lib,
         action = Copy("$TARGET", "$SOURCE"))

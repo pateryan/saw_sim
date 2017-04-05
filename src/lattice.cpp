@@ -1,13 +1,14 @@
 #include "lattice.hpp"
 
+#include <climits>
+
 #define NUM_NEIGHBORS 4
-#define INVALID_LATTICE_SITE INT_MAX
 
 namespace saw {
 
 namespace impl {
 static std::vector<std::size_t> 
-calculate_neighbors(std::size_t widht, std::size_t height, 
+calculate_neighbors(std::size_t width, std::size_t height, 
                     std::size_t loc, BoundaryCondition bc);
 } // namespace impl
 
@@ -23,6 +24,9 @@ Lattice::Lattice(std::size_t width, std::size_t height, BoundaryCondition bc)
     for (auto i = 0ul; i < size; ++i) {
         nearest_neighbor_arr[i] = impl::calculate_neighbors(width, height, i, bc);
     }
+    for (auto& i : lattice_sites) {
+        i = 0;
+    }
 }
 
 /**
@@ -32,12 +36,50 @@ Lattice::Lattice(std::size_t width, std::size_t height, BoundaryCondition bc)
 void 
 Lattice::print(std::ostream& stream) const
 {
-    for (auto i = size; i > 0; ++i) {
-        if (i % width == 0) {
-            stream << endl;
+    // warning, this is an unsigned number being decremented, having i >=
+    // 0 will lead to an underflow on --i, resulting in an infinite loop.
+    for (auto i = size - 1; i > 0; --i) {
+        if ((i + 1) % width == 0) {
+            stream << std::endl;
         }
-        stream << *this[i] << " ";
+        stream << (unsigned int)lattice_sites[i] << " ";
     }
+    stream << (unsigned int)lattice_sites[0] << " ";
+    stream << std::endl;
+}
+
+void
+Lattice::print_neighbor(std::ostream& stream) const
+{
+    for (auto i = 0ul; i < size; ++i) {
+        stream << i << ": ";
+        for (auto v: nearest_neighbor_arr[i]) {
+            if (v == INVALID_LATTICE_SITE) {
+                stream << 'x' << ",\t";
+            } else {
+                stream << v << ",\t";
+            }
+        }
+        stream << std::endl;
+    }
+}
+
+std::size_t
+Lattice::get_neighbor(std::size_t loc, Direction d)
+{
+    switch(d){
+        case Direction::left:
+            return nearest_neighbor_arr[loc][0];
+        case Direction::up:
+            return nearest_neighbor_arr[loc][1];
+        case Direction::right:
+            return nearest_neighbor_arr[loc][2];
+        case Direction::down:
+            return nearest_neighbor_arr[loc][3];
+        case Direction::inval:
+            return INVALID_LATTICE_SITE;
+    }
+    return INVALID_LATTICE_SITE; // shut up gcc warning
 }
 
 } // namespace saw
@@ -58,11 +100,11 @@ namespace saw { namespace impl {
 
 // internal functions that Lattice does not need to know about
 static std::vector<std::size_t> 
-calculate_neighbors_periodic(std::size_t widht, std::size_t height, 
+calculate_neighbors_periodic(std::size_t width, std::size_t height, 
                              std::size_t loc);
 
 static std::vector<std::size_t> 
-calculate_neighbors_finite(std::size_t widht, std::size_t height, 
+calculate_neighbors_finite(std::size_t width, std::size_t height, 
                            std::size_t loc);
 
 //----------------------------------------------------------------------------
@@ -70,7 +112,7 @@ calculate_neighbors_finite(std::size_t widht, std::size_t height,
 //----------------------------------------------------------------------------
 
 static std::vector<std::size_t> 
-calculate_neighbors(std::size_t widht, std::size_t height, 
+calculate_neighbors(std::size_t width, std::size_t height, 
                     std::size_t loc, BoundaryCondition bc)
 {
     auto vec = std::vector<std::size_t>(NUM_NEIGHBORS);
@@ -83,10 +125,18 @@ calculate_neighbors(std::size_t widht, std::size_t height,
 }
 
 static std::vector<std::size_t> 
-calculate_neighbors_periodic(std::size_t widht, std::size_t height, 
+calculate_neighbors_periodic(std::size_t width, std::size_t height, 
                              std::size_t loc)
 {
     auto vec = std::vector<size_t>(NUM_NEIGHBORS);
+    // special case where there is only one element
+    if (width == 1 && height == 1) {
+        vec[0] = 0;
+        vec[1] = 0;
+        vec[2] = 0;
+        vec[3] = 0;
+        return vec;
+    }
     // left boundary
     if (loc % height == 0) {
         vec[0] = loc + (width - 1); 
@@ -115,7 +165,7 @@ calculate_neighbors_periodic(std::size_t widht, std::size_t height,
 }
 
 static std::vector<std::size_t> 
-calculate_neighbors_finite(std::size_t widht, std::size_t height, 
+calculate_neighbors_finite(std::size_t width, std::size_t height, 
                              std::size_t loc)
 {
     auto vec = std::vector<size_t>(NUM_NEIGHBORS);

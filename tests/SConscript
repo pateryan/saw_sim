@@ -4,9 +4,9 @@ import os
 
 Import('env')
 
-src_files = ['t_direction.cpp']
+src_files = ['t_direction.cpp', 't_lattice.cpp']
 i = 0
 #print src_files
 for src in src_files:
-    env.Program('test' + str(i), src, LIBS = ['saw'], LIBPATH='#/build/')
+    env.Program('tes' + src, src, LIBS = ['saw'], LIBPATH='#/build/')
     i += 1
